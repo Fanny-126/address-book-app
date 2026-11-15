@@ -108,11 +108,11 @@ E2E 失败时上传 `playwright-report/` 作为排查证据。
 | 公网访问地址 | https://37jw5fqtq7n1oeaviuq.traesite.cn |
 | 部署方式 | Trae 静态托管（StaticWeb，公网可访问），上传 `npm run build` 产物 `dist/` |
 | 云服务器 | 未使用独立云服务器；本文第 3 节的 Docker + Nginx 方案已随仓库交付，可原样执行 |
-| 部署提交 | `1242c7f`（星星人主题，PR #3 合并；首次上线为 `1d90cf3`） |
-| 部署时间 | 2026-11-15 20:29（Asia/Shanghai） |
-| 部署 ID | `dep_6af9a5a97e97d9bc38db13b0` |
+| 部署提交 | `e6ac059`（泡泡玛特星星人风格暖金主题，PR #5；历史版本 `1242c7f`、`1d90cf3`） |
+| 部署时间 | 2026-11-15 20:38（Asia/Shanghai） |
+| 部署 ID | `dep_6af9a7bc195ed033c1f92a6b` |
 | 验收人 | 成员 B |
-| 验收结果 | 首页 200，静态资源 200，`/contacts/`、`/favorites/`、`/import-export/` 带尾斜杠可直达并正常渲染；星星人主题样式已生效（星空背景、星星吉祥物、紫金配色）；Docker/Nginx 配置通过构建校验（本机无 Docker 环境，未实机启动容器） |
+| 验收结果 | 首页 200，静态资源 200，`/contacts/`、`/favorites/`、`/import-export/` 带尾斜杠可直达并正常渲染；暖金星星人主题已生效（奶油色星星人吉祥物、星月背景、毛绒质感圆角卡片）；Docker/Nginx 配置通过构建校验（本机无 Docker 环境，未实机启动容器） |
 
 验收实际执行的命令与结果：
 
