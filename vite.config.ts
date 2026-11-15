@@ -1,12 +1,22 @@
+import { copyFileSync } from 'node:fs'
 import path from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import { inspectAttr } from 'kimi-plugin-inspect-react'
 
+// 生成 404.html，适配 GitHub Pages 等静态托管服务的 SPA 深层路由回退
+const spa404Fallback = {
+  name: 'spa-404-fallback',
+  closeBundle() {
+    const distDir = path.resolve(__dirname, 'dist')
+    copyFileSync(path.join(distDir, 'index.html'), path.join(distDir, '404.html'))
+  },
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
-  plugins: [inspectAttr(), react()],
+  plugins: [inspectAttr(), react(), spa404Fallback],
   server: {
     port: 3000,
   },
