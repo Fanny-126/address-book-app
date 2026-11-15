@@ -108,11 +108,11 @@ E2E 失败时上传 `playwright-report/` 作为排查证据。
 | 公网访问地址 | https://37jw5fqtq7n1oeaviuq.traesite.cn |
 | 部署方式 | Trae 静态托管（StaticWeb，公网可访问），上传 `npm run build` 产物 `dist/` |
 | 云服务器 | 未使用独立云服务器；本文第 3 节的 Docker + Nginx 方案已随仓库交付，可原样执行 |
-| 部署提交 | `3018f62`（泡泡玛特星星人官方造型主题，PR #6；历史版本 `e6ac059`、`1242c7f`、`1d90cf3`） |
-| 部署时间 | 2026-11-15 21:10（Asia/Shanghai） |
-| 部署 ID | `dep_6af9af2309c5b027f558b05f` |
+| 部署提交 | `b3c97f1`（紫金星空主题 + 点击星星粒子特效，PR #8；历史版本 `3018f62`、`e6ac059`、`1242c7f`、`1d90cf3`） |
+| 部署时间 | 2026-11-15 21:29（Asia/Shanghai） |
+| 部署 ID | `dep_6af9b3a6d7ffcd23c59870f0` |
 | 验收人 | 成员 B |
-| 验收结果 | 首页 200，静态资源 200，`/contacts/`、`/favorites/`、`/import-export/` 带尾斜杠可直达并正常渲染；暖橙奶油星星人主题已生效（圆头桃橙皮肤吉祥物、大眼高光、大鼻头与腮红、星星兜帽与围巾、暖橙星点背景）；Docker/Nginx 配置通过构建校验（本机无 Docker 环境，未实机启动容器） |
+| 验收结果 | 首页 200，静态资源 200，`/contacts/`、`/favorites/`、`/import-export/` 带尾斜杠可直达并正常渲染；紫金星空主题与点击星尘特效已生效（浅紫渐变星空、金色星星吉祥物、16 颗金紫粒子与扩散光环，装饰层不拦截交互，reduced-motion 下自动关闭）；Docker/Nginx 配置通过构建校验（本机无 Docker 环境，未实机启动容器） |
 
 验收实际执行的命令与结果：
 
