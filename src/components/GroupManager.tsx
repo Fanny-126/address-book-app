@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Group } from '@/types/contact';
 import { contactRepository } from '@/repository/contactRepository';
 import { ConfirmDialog } from '@/components/ui';
-import { useToast } from '@/components/Toast';
+import { useToast } from '@/components/toastContext';
 
 /** 分组管理弹窗：新建 / 重命名 / 删除（删除分组不删联系人，A6） */
 export function GroupManager({
@@ -25,9 +25,12 @@ export function GroupManager({
 
   useEffect(() => {
     if (open) {
+      // 每次打开弹窗等价于重新挂载，需要重置内部编辑状态
+      /* eslint-disable react-hooks/set-state-in-effect */
       setNewName('');
       setEditingId(null);
       setDeleting(null);
+      /* eslint-enable react-hooks/set-state-in-effect */
       inputRef.current?.focus();
     }
   }, [open]);

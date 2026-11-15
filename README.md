@@ -17,8 +17,8 @@ npm run dev        # 开发模式，访问 http://localhost:3000
 ## 测试
 
 ```bash
-npm run test       # 单元测试（Vitest + fake-indexeddb，26 个用例）
-npm run test:e2e   # 端到端测试（Playwright，完整工作流）
+npm run test       # 单元测试（Vitest + fake-indexeddb，52 个用例）
+npm run test:e2e   # 端到端测试（Playwright，6 条工作流）
 ```
 
 E2E 首次运行前需要安装浏览器：
@@ -47,11 +47,17 @@ src/
   repository/contactRepository.ts  ContactRepository 的 IndexedDB 实现（含事务与变更通知）
   lib/validation.ts             姓名 / 邮箱 / 自定义标签 / 分组名校验
   lib/search.ts                 搜索与「搜索 + 分组」组合筛选
+  lib/excel/                    标准 Excel 导出、导入解析、表头别名、去重与预览
   hooks/useAddressBook.ts       订阅仓储变更的 React Hook（各视图自动同步）
-  components/                   表单、列表、星标、弹窗、分组管理、Toast 等
-  pages/                        联系人页 / 收藏页(/favorites) / 新建 / 编辑
+  components/                   表单、列表、星标、弹窗、分组管理、Toast、公共 UI
+  pages/                        联系人 / 收藏 / 新建 / 编辑 / 导入导出
 tests/setup.ts                  测试初始化（fake-indexeddb + 每用例清库）
-e2e/contact-workflow.spec.ts    完整工作流 E2E
+tests/fixtures/                 Excel / CSV 测试文件与生成脚本
+e2e/contact-workflow.spec.ts    A 模块完整工作流 E2E
+e2e/excel-workflow.spec.ts      B 模块 Excel 导入导出 E2E
+deploy/nginx.conf               SPA 回退、缓存、gzip 与安全响应头
+docs/                           代码规范、部署说明、发布说明
+Dockerfile / docker-compose.yml 云服务器部署
 ```
 
 ## 数据结构设计
@@ -118,9 +124,62 @@ Group { id: string; name: string; createdAt: string }
 - E2E 1 条完整工作流：新建多联系方式 → 收藏 → 搜索 → 分组 → 编辑 →
   刷新验证 → 删除（测试结束清理自身数据）。
 
+### 应用外壳与公共 UI（B0 / B1）
+- 顶部导航统一为联系人、收藏、导入导出，支持激活态与键盘操作；
+- 所有路由可直达、刷新和浏览器前进后退；未知地址显示 404 与返回首页入口；
+- 新增 `PageHeader`、`Modal`、`StatusBadge` 公共组件；
+- 360 / 768 / 1440 宽度下无页面横向溢出，长姓名、邮箱、地址自动换行或截断。
+
+### Excel 导出（B2 / B3）
+- `Contacts` 主表固定六列「姓名、电话、邮箱、地址、备注、是否收藏」，
+  一位联系人只占一行，多条同类型联系方式在单元格内换行；
+- 电话列使用文本格式 `@`，保留 `+86`、`001234` 等原始字符；
+- 所有用户文本以字符串单元格写入，不会触发 Excel 公式；
+- `ContactDetails` 明细表保存全部联系方式（主表行号、联系人 ID、姓名、类型、标签、值、顺序），
+  支撑多社交账号、自定义标签等主表无法表达的数据无损回导；
+- 空通讯录也能导出仅含表头的文件，文件名形如 `contacts_20261115_203000.xlsx`。
+
+### Excel 导入（B4 / B5）
+- 支持 `.xlsx`、`.xls`、UTF-8 CSV，单文件上限 10 MB；
+- 表头兼容：姓名 / Name / Full Name、First Name + Last Name、电话 / Phone / Mobile、
+  邮箱 / E-mail、地址 / Address、备注 / Notes、是否收藏 / Favorite 等；
+- 兼容 Google Contacts 的 `Phone 1 - Value`、`E-mail 1 - Value`、`Address 1 - Formatted`
+  与 Outlook 的多电话多邮箱列；
+- 收藏值兼容 是/否、TRUE/FALSE、1/0、Y/N；
+- 有 `ContactDetails` 时优先按明细恢复，避免与主表多值单元格重复拼接；
+- 导入前预览新增 / 强重复 / 疑似重复 / 错误数量，用户确认后才单事务写入；
+- 规范化电话或邮箱相同为强重复，默认跳过；只有姓名相同标记疑似重复，不直接删除；
+- 姓名缺失、非法邮箱、明细格式错误显示真实 Excel 行号并整行跳过；
+- 重复点击确认按钮不会重复导入，批量写入失败会如实报告。
+
+```ts
+// 浏览器本地解析，不上传服务器
+const preview = await previewImportFile(file, repository); // 只读
+const result = await commitImport(preview, { skipSuspected: false }, repository);
+```
+
+### 测试（B6）
+- 单元测试新增 26 例：六列导出、明细表、公式安全、表头别名、收藏别名、
+  `.xls` 前导零、CSV、行级错误、去重、预览只读、批量失败；
+- E2E 新增 5 条：标准 Excel 导入→导出→重复拦截、Google CSV 多联系方式、
+  错误行与损坏文件、ContactDetails 无损回导、响应式与 404；
+- 测试 fixtures 位于 `tests/fixtures/`，二进制文件由
+  `node tests/fixtures/generate-fixtures.mjs` 可重复生成。
+
+### 部署与 CI（B7 / B8）
+- 线上演示：https://37jw5fqtq7n1oeaviuq.traesite.cn （静态托管，
+  `/contacts/`、`/favorites/`、`/import-export/` 请带尾斜杠访问）；
+- 多阶段 Docker 构建，运行阶段仅 Nginx + 静态文件；
+- `deploy/nginx.conf` 提供 SPA 回退、静态资源长缓存、gzip 与安全响应头；
+- `docker compose up -d --build` 一条命令部署，`/healthz` 健康检查；
+- GitHub Actions 执行 Lint、单测、构建和 Playwright E2E；
+- 详细步骤见 [部署说明](docs/deployment.md)，协作规范见 [代码风格](docs/code-style.md)，
+  版本内容见 [v1.0.0 发布说明](docs/release-v1.0.0.md)。
+
 ## 当前边界
 
-应用外壳 / 路由集成、Excel 导入导出、云部署由成员 B 负责（B0–B8），
-本仓库当前为 A 模块完整可运行版本，外壳为最小开发外壳，供 B 替换扩展。
-
-- 成员 A：联系人 / 收藏 / 分组 / 数据层模块已完成，26 项单元测试 + 1 项 E2E 测试全部通过。
+- 成员 A：联系人 / 收藏 / 分组 / 数据层模块完成，26 项单元测试 + 1 项 E2E 通过。
+- 成员 B：应用外壳、响应式 UI、Excel 导入导出、测试、部署与 CI 完成
+  （B0–B8），共 52 项单元测试 + 6 条 E2E 通过。
+- 导入文件上限 10 MB；CSV 仅保证 UTF-8；号码按规范化完整字符串比较，
+  不自动把 `+86` 与本地号码视为同一号码；数据保存在当前浏览器 IndexedDB。

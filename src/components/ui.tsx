@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 
 /** 星标收藏按钮：aria-label 明确为「收藏xx / 取消收藏xx」（A4 可访问性要求） */
 export function StarButton({
@@ -33,6 +33,97 @@ export function EmptyState({ title, hint }: { title: string; hint?: string }) {
     <div className="empty-state">
       <p className="big">{title}</p>
       {hint ? <p>{hint}</p> : null}
+    </div>
+  );
+}
+
+/** 页面标题区：统一标题、说明与右侧操作 */
+export function PageHeader({
+  title,
+  subtitle,
+  actions,
+}: {
+  title: string;
+  subtitle?: string;
+  actions?: ReactNode;
+}) {
+  return (
+    <div className="page-header">
+      <div className="page-header-text">
+        <h1 className="page-title">{title}</h1>
+        {subtitle ? <p className="page-subtitle">{subtitle}</p> : null}
+      </div>
+      {actions ? <div className="page-header-actions">{actions}</div> : null}
+    </div>
+  );
+}
+
+export function StatusBadge({
+  tone = 'neutral',
+  children,
+}: {
+  tone?: 'neutral' | 'success' | 'warning' | 'danger';
+  children: ReactNode;
+}) {
+  return <span className={`badge badge-${tone}`}>{children}</span>;
+}
+
+/** 通用弹窗：打开后聚焦关闭按钮，Escape / 遮罩 / 取消均可关闭 */
+export function Modal({
+  open,
+  title,
+  children,
+  footer,
+  onClose,
+  wide = false,
+}: {
+  open: boolean;
+  title: string;
+  children: ReactNode;
+  footer?: ReactNode;
+  onClose: () => void;
+  wide?: boolean;
+}) {
+  const titleId = useId();
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    closeRef.current?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+  return (
+    <div
+      className="modal-backdrop open"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <div className={`modal${wide ? ' modal-wide' : ''} modal-scroll`}>
+        <div className="modal-head">
+          <h3 id={titleId}>{title}</h3>
+          <button
+            ref={closeRef}
+            type="button"
+            className="modal-close"
+            aria-label="关闭弹窗"
+            onClick={onClose}
+          >
+            ×
+          </button>
+        </div>
+        <div className="modal-body">{children}</div>
+        {footer ? <div className="modal-btns">{footer}</div> : null}
+      </div>
     </div>
   );
 }

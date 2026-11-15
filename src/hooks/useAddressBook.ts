@@ -22,6 +22,8 @@ export function useAddressBook() {
   }, []);
 
   useEffect(() => {
+    // 首次挂载时从 IndexedDB 异步加载，属于与外部存储同步
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void reload();
     const unsubscribe = contactRepository.subscribe(() => {
       void reload();

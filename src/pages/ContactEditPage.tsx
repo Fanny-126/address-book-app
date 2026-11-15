@@ -4,7 +4,7 @@ import { useAddressBook } from '@/hooks/useAddressBook';
 import { contactRepository } from '@/repository/contactRepository';
 import { ContactForm } from '@/components/ContactForm';
 import { ConfirmDialog, EmptyState } from '@/components/ui';
-import { useToast } from '@/components/Toast';
+import { useToast } from '@/components/toastContext';
 
 /** 编辑联系人页（A2）：回填全部字段 + 删除（二次确认） */
 export function ContactEditPage() {
