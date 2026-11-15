@@ -1,22 +1,32 @@
-import { copyFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync } from 'node:fs'
 import path from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import { inspectAttr } from 'kimi-plugin-inspect-react'
 
-// 生成 404.html，适配 GitHub Pages 等静态托管服务的 SPA 深层路由回退
-const spa404Fallback = {
-  name: 'spa-404-fallback',
+// 静态托管只能按文件路径匹配，无法像 Nginx 那样做 try_files 回退。
+// 构建时为每个前端路由生成入口文件，并额外生成 404.html，保证直接访问与刷新可用。
+const STATIC_ROUTES = ['contacts', 'contacts/new', 'favorites', 'import-export', 'excel']
+
+const spaStaticRoutes = {
+  name: 'spa-static-routes',
   closeBundle() {
     const distDir = path.resolve(__dirname, 'dist')
-    copyFileSync(path.join(distDir, 'index.html'), path.join(distDir, '404.html'))
+    const indexFile = path.join(distDir, 'index.html')
+    copyFileSync(indexFile, path.join(distDir, '404.html'))
+    for (const route of STATIC_ROUTES) {
+      const routeDir = path.join(distDir, route)
+      mkdirSync(routeDir, { recursive: true })
+      copyFileSync(indexFile, path.join(routeDir, 'index.html'))
+    }
   },
 }
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: './',
-  plugins: [inspectAttr(), react(), spa404Fallback],
+  // 静态托管需要绝对资源路径，否则 /contacts/ 下的相对路径会指向 /contacts/assets
+  base: '/',
+  plugins: [inspectAttr(), react(), spaStaticRoutes],
   server: {
     port: 3000,
   },
