@@ -167,6 +167,8 @@ const result = await commitImport(preview, { skipSuspected: false }, repository)
   `node tests/fixtures/generate-fixtures.mjs` 可重复生成。
 
 ### 部署与 CI（B7 / B8）
+- 线上演示：https://37jw5fqtq7n1oeaviuq.traesite.cn （静态托管，
+  `/contacts/`、`/favorites/`、`/import-export/` 请带尾斜杠访问）；
 - 多阶段 Docker 构建，运行阶段仅 Nginx + 静态文件；
 - `deploy/nginx.conf` 提供 SPA 回退、静态资源长缓存、gzip 与安全响应头；
 - `docker compose up -d --build` 一条命令部署，`/healthz` 健康检查；

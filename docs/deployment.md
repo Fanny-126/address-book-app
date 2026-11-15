@@ -105,11 +105,36 @@ E2E 失败时上传 `playwright-report/` 作为排查证据。
 
 | 项目 | 值 |
 | --- | --- |
-| 公网访问地址 | 待部署后填写 |
-| 云服务器 | 待填写（地域 / 规格 / 系统） |
-| 部署提交 | 待填写（`git rev-parse HEAD`） |
-| 部署时间 | 待填写 |
-| 验收人 | 待填写 |
-| 验收结果 | 待填写 |
+| 公网访问地址 | https://37jw5fqtq7n1oeaviuq.traesite.cn |
+| 部署方式 | Trae 静态托管（StaticWeb，公网可访问），上传 `npm run build` 产物 `dist/` |
+| 云服务器 | 未使用独立云服务器；本文第 3 节的 Docker + Nginx 方案已随仓库交付，可原样执行 |
+| 部署提交 | `1d90cf3`（分支 `feature/b0-b8-address-book`） |
+| 部署时间 | 2026-11-15 20:01（Asia/Shanghai） |
+| 部署 ID | `dep_6af99f277e97d9bc38db129d` |
+| 验收人 | 成员 B |
+| 验收结果 | 首页 200，静态资源 200，`/contacts/`、`/favorites/`、`/import-export/` 带尾斜杠可直达并正常渲染；Docker/Nginx 配置通过构建校验（本机无 Docker 环境，未实机启动容器） |
+
+验收实际执行的命令与结果：
+
+```text
+/                        200  bytes=807   （index.html）
+/contacts/               200  bytes=807   （生成的静态入口）
+/favorites/              200  bytes=807
+/import-export/          200  bytes=807
+/assets/index-*.js       200
+```
+
+### 静态托管平台限制
+
+Trae 静态托管按文件路径精确匹配，不提供 Nginx 的 `try_files` 回退，因此：
+
+- 直接访问 `/contacts`（不带尾斜杠）返回平台 404，访问 `/contacts/` 正常；
+- 应用内的导航、刷新、前进后退均由前端路由接管，不受影响；
+- 平台不使用构建产物中的 `404.html`，未知路径显示平台自带 404 页。
+
+构建脚本 `vite.config.ts` 中的 `spaStaticRoutes` 插件在构建时为各主路由生成
+`<route>/index.html`，并把 `base` 设为 `/`，因此带上尾斜杠即可在纯静态托管下直达。
+需要「任意深层路由刷新都不 404」的场景请使用第 3 节的 Docker + Nginx 部署，
+`deploy/nginx.conf` 已包含 `try_files $uri $uri/ /index.html`。
 
 > 部署记录必须在验收前更新为真实值，不接受占位符或本地地址。
