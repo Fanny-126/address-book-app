@@ -5,8 +5,8 @@ import { METHOD_TYPE_NAME } from '@/lib/validation';
 import { StarButton, EmptyState } from '@/components/ui';
 import { useToast } from '@/components/toastContext';
 
-// 星星人主题头像配色：桃橙、奶油、可可的暖调色块，呼应吉祥物皮肤与围巾
-const AVATAR_COLORS = ['#ffd3ae', '#ffc3b0', '#ffe1bb', '#f6c9a2', '#ffd8c6', '#f4ddc3', '#ffcbb4', '#e7dcc2'];
+// 星星人主题头像配色：与整体星空紫金调统一，且保证白色文字对比度
+const AVATAR_COLORS = ['#6f5bd6', '#cf4f8e', '#b06a00', '#2f8f7f', '#4a7bd0', '#8a4fb8', '#c25252', '#5b6bb5'];
 
 function avatarColor(name: string): string {
   let h = 0;

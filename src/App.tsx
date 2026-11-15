@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Link, Navigate, NavLink, Route, Routes } from 'react-router';
 import { ToastProvider } from '@/components/Toast';
+import { StarBurst } from '@/components/StarBurst';
 import { ContactsPage } from '@/pages/ContactsPage';
 import { FavoritesPage } from '@/pages/FavoritesPage';
 import { ContactNewPage } from '@/pages/ContactNewPage';
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
 export default function App() {
   return (
     <ToastProvider>
+      <StarBurst />
       <a className="skip-link" href="#main-content">
         跳到主要内容
       </a>
