@@ -39,6 +39,7 @@
 - GitHub Actions 执行 Lint、单测、构建与 E2E。
 
 ### 云部署（B7）
+- 线上演示：https://37jw5fqtq7n1oeaviuq.traesite.cn （静态托管；`/contacts/`、`/favorites/`、`/import-export/` 带尾斜杠访问）。
 - 多阶段 `Dockerfile`。
 - `deploy/nginx.conf` 提供 SPA 回退、静态缓存、gzip 与安全响应头。
 - `docker-compose.yml` 一条命令启动，含健康检查。
