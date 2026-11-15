@@ -3,7 +3,7 @@ import type { Contact } from '@/types/contact';
 import { contactRepository } from '@/repository/contactRepository';
 import { METHOD_TYPE_NAME } from '@/lib/validation';
 import { StarButton, EmptyState } from '@/components/ui';
-import { useToast } from '@/components/Toast';
+import { useToast } from '@/components/toastContext';
 
 const AVATAR_COLORS = ['#c96f4a', '#a8824f', '#7d8f69', '#5f8575', '#6b7f9e', '#96708a', '#b3563e', '#8a7d6b'];
 

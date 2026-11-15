@@ -1,30 +1,12 @@
 import type { ContactMethodType } from '@/types/contact';
 import { METHOD_TYPE_NAME } from '@/lib/validation';
-
-/** 表单内编辑用的联系方式行（key 仅作 React key，入库时由仓储生成正式 id 与 order） */
-export interface MethodRow {
-  key: string;
-  type: ContactMethodType;
-  label: string;
-  value: string;
-}
-
-const LABEL_PRESETS: Record<Exclude<ContactMethodType, 'custom'>, string[]> = {
-  phone: ['手机', '公司', '住宅', '其他'],
-  email: ['个人', '工作', '其他'],
-  social: ['微信', 'QQ', '微博', 'LinkedIn', '其他'],
-  address: ['家庭', '公司', '其他'],
-};
-
-export const ALL_TYPES: ContactMethodType[] = ['phone', 'email', 'social', 'address', 'custom'];
-
-export function defaultLabel(type: ContactMethodType): string {
-  return type === 'custom' ? '' : LABEL_PRESETS[type][0];
-}
-
-export function newRow(type: ContactMethodType): MethodRow {
-  return { key: crypto.randomUUID(), type, label: defaultLabel(type), value: '' };
-}
+import {
+  ALL_TYPES,
+  defaultLabel,
+  labelPresets,
+  newRow,
+  type MethodRow,
+} from '@/components/methodEditorModel';
 
 /** 联系方式编辑器：类型 + 标签 + 内容，支持任意增删，custom 类型显示自定义标签输入框 */
 export function MethodEditor({
@@ -76,12 +58,12 @@ export function MethodEditor({
                 value={row.label}
                 onChange={(e) => updateRow(row.key, { label: e.target.value })}
               >
-                {LABEL_PRESETS[row.type as Exclude<ContactMethodType, 'custom'>].map((l) => (
+                {labelPresets(row.type as Exclude<ContactMethodType, 'custom'>).map((l) => (
                   <option key={l} value={l}>
                     {l}
                   </option>
                 ))}
-                {!LABEL_PRESETS[row.type as Exclude<ContactMethodType, 'custom'>].includes(row.label) && row.label !== '' && (
+                {!labelPresets(row.type as Exclude<ContactMethodType, 'custom'>).includes(row.label) && row.label !== '' && (
                   <option value={row.label}>{row.label}</option>
                 )}
               </select>

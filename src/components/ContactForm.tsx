@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { Contact, ContactInput, Group } from '@/types/contact';
 import { contactRepository } from '@/repository/contactRepository';
-import { MethodEditor, newRow, type MethodRow } from '@/components/MethodEditor';
-import { useToast } from '@/components/Toast';
+import { MethodEditor } from '@/components/MethodEditor';
+import { newRow, type MethodRow } from '@/components/methodEditorModel';
+import { useToast } from '@/components/toastContext';
 
 /**
  * 新增 / 编辑共用表单（A2）。
